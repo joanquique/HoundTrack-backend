@@ -34,7 +34,7 @@ class GuiaViewSet(viewsets.ViewSet):
         except Guia.DoesNotExist:
             return Response({"detail": "Guía no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = GuiaSerializer(guia, data=request.data)  # PUT
+        serializer = GuiaSerializer(guia, data=request.data, partial=True)  # PUT
         serializer.is_valid(raise_exception=True)
         guia = serializer.save()
         return Response(GuiaSerializer(guia).data, status=status.HTTP_200_OK)
@@ -47,3 +47,8 @@ class GuiaViewSet(viewsets.ViewSet):
 
         guia.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def list(self, request):
+        guias = Guia.objects.all().order_by("-createdAt")
+        serializer = GuiaSerializer(guias, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
